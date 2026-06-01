@@ -5,7 +5,7 @@ from textblob import TextBlob
 from datetime import datetime
 
 # ====== YOUR SETTINGS ======
-TELEGRAM_TOKEN = '8974789330:AAES4xR7YGJ9dGXrlC0iPVmspQqHC7BNbSg'
+TELEGRAM_TOKEN = '8974789330:AAGXL1ZTQY2ckbVCpj32Nq7aXDM8TsR62AE'
 CHAT_ID = '5487451507'
 GOLD_THRESHOLD = 2000  # Alert if gold price > $2000
 PROXY = {'https': 'http://proxy.server:3128'}  # PythonAnywhere free proxy

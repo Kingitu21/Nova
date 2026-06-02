@@ -1,4 +1,3 @@
-python-telegram-bot==13.15
-requests==2.31.0
-urllib3==1.26.18
-setuptools==59.5.0
+git add requirements.txt
+git commit -m "Remove imghdr, add setuptools"
+git push

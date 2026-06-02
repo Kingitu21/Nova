@@ -13,10 +13,11 @@ def start(update: Update, context: CallbackContext):
 
 def price(update: Update, context: CallbackContext):
     try:
-        price = float(requests.get("https://api.metals.live/v1/spot", timeout=10).json()[0]['gold'])
+        data = requests.get("https://api.metals.live/v1/spot", timeout=10).json()
+        price = float(data['gold']) # Fixed: removed [0], API returns dict not list
         update.message.reply_text(f"💰 Gold: ${price:.2f}/oz")
-    except:
-        update.message.reply_text("Price check failed")
+    except Exception as e:
+        update.message.reply_text(f"Price check failed: {e}")
 
 def chatback(update: Update, context: CallbackContext):
     update.message.reply_text("Yo! I'm alive 😎 v13 Updater working")
@@ -27,7 +28,6 @@ def send_telegram(msg):
 
 def alert_loop():
     print("Bot running... Telegram alerts: ACTIVE ✅")
-    send_telegram("🤖 Bot RESTARTED with PTB v13!\nUpdater error fixed.")
     while True:
         time.sleep(600)
 
@@ -41,4 +41,8 @@ dp.add_handler(MessageHandler(Filters.text & ~Filters.command, chatback))
 
 print("Chat bot started...")
 updater.start_polling()
+
+# Moved startup message here - after polling starts
+send_telegram("🤖 Bot RESTARTED with PTB v13!\nUpdater error fixed.")
+
 updater.idle()

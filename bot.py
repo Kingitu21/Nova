@@ -1,48 +1,45 @@
-import time
-import requests
 import os
-import threading
+import requests
 from telegram import Update
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
 
-TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
-CHAT_ID = '5487451507'
+TOKEN = os.environ.get("BOT_TOKEN")
 
 def start(update: Update, context: CallbackContext):
-    update.message.reply_text("🚀 GOLG SNIPER BOT online!\nPTB v13 mode active\nTry: /price or say Hi")
+    update.message.reply_text(
+        "🚀 GOLG SNIPER BOT online!\n"
+        "PTB v13 mode active\n"
+        "Try: /price or say Hi"
+    )
 
 def price(update: Update, context: CallbackContext):
     try:
-        data = requests.get("https://api.metals.live/v1/spot", timeout=10).json()
-        price = float(data['gold']) # Fixed: removed [0], API returns dict not list
-        update.message.reply_text(f"💰 Gold: ${price:.2f}/oz")
+        response = requests.get("https://api.gold-api.com/price/XAU", timeout=10)
+        response.raise_for_status()
+        data = response.json()
+        gold_price = data["price"]
+        update.message.reply_text(f"💰 Gold: ${gold_price:.2f}/oz\nUpdated: {data.get('timestamp', 'now')}")
     except Exception as e:
-        update.message.reply_text(f"Price check failed: {e}")
+        update.message.reply_text(f"Price check failed:\n{e}")
 
-def chatback(update: Update, context: CallbackContext):
-    update.message.reply_text("Yo! I'm alive 😎 v13 Updater working")
+def handle_message(update: Update, context: CallbackContext):
+    text = update.message.text.lower()
+    if "hi" in text or "hello" in text:
+        update.message.reply_text("Yo! I'm alive 😎 v13 Updater working")
+    else:
+        update.message.reply_text("Type /price for gold price")
 
-def send_telegram(msg):
-    requests.post(f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage",
-                  data={'chat_id': CHAT_ID, 'text': msg}, timeout=10)
+def main():
+    updater = Updater(TOKEN, use_context=True)
+    dp = updater.dispatcher
 
-def alert_loop():
-    print("Bot running... Telegram alerts: ACTIVE ✅")
-    while True:
-        time.sleep(600)
+    dp.add_handler(CommandHandler("start", start))
+    dp.add_handler(CommandHandler("price", price))
+    dp.add_handler(MessageHandler(Filters.text & ~Filters.command, handle_message))
 
-threading.Thread(target=alert_loop, daemon=True).start()
+    updater.start_polling()
+    print("Bot started...")
+    updater.idle()
 
-updater = Updater(token=TELEGRAM_TOKEN, use_context=True)
-dp = updater.dispatcher
-dp.add_handler(CommandHandler("start", start))
-dp.add_handler(CommandHandler("price", price))
-dp.add_handler(MessageHandler(Filters.text & ~Filters.command, chatback))
-
-print("Chat bot started...")
-updater.start_polling()
-
-# Moved startup message here - after polling starts
-send_telegram("🤖 Bot RESTARTED with PTB v13!\nUpdater error fixed.")
-
-updater.idle()
+if __name__ == "__main__":
+    main()

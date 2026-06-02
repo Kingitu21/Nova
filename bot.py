@@ -11,7 +11,7 @@ from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, fil
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 CHAT_ID = '5487451507'
 GOLD_THRESHOLD = 2000
-PROXY = {'https': 'http://proxy.server:3128'}
+PROXY = PROXY = None  # Render has direct internet, no proxy needed
 
 def get_gold_price():
     try:
